@@ -738,7 +738,7 @@
     "message": "Import Wallet"
   },
   "importYourExisting": {
-    "message": "Import your existing wallet using a 12 word seed phrase"
+    "message": "Import your existing wallets using a BitGo access token"
   },
   "imported": {
     "message": "Imported",
@@ -948,10 +948,10 @@
     "message": "New Network"
   },
   "newToMetaMask": {
-    "message": "New to MetaMask?"
+    "message": "New to BitGo MetaMask?"
   },
   "noAlreadyHaveSeed": {
-    "message": "No, I already have a seed phrase"
+    "message": "No, I already have a BitGo Access Token"
   },
   "protectYourKeys": {
     "message": "Protect Your Keys!"
@@ -1709,7 +1709,7 @@
     "message": "Welcome Back!"
   },
   "welcome": {
-    "message": "Welcome to MetaMask"
+    "message": "Welcome to BitGo MetaMask"
   },
   "whatsThis": {
     "message": "What's this?"
