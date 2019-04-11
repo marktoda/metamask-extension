@@ -295,7 +295,6 @@ class PreferencesController {
    */
   syncAddresses (addresses) {
     const { identities, lostIdentities } = this.store.getState()
-
     const newlyLost = {}
     Object.keys(identities).forEach((identity) => {
       if (!addresses.includes(identity)) {

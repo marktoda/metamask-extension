@@ -377,7 +377,6 @@ function tryUnlockMetamask (password) {
         if (error) {
           return reject(error)
         }
-
         resolve()
       })
     })

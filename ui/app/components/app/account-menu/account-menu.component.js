@@ -58,7 +58,6 @@ export default class AccountMenu extends PureComponent {
       keyrings,
       showAccountDetail,
     } = this.props
-
     const accountOrder = keyrings.reduce((list, keyring) => list.concat(keyring.accounts), [])
 
     return accountOrder.filter(address => !!identities[address]).map(address => {

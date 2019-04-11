@@ -144,20 +144,13 @@ WalletView.prototype.render = function () {
   }
 
   const keyring = keyrings.find((kr) => {
-    return kr.accounts.includes(selectedAddress)
+    return kr.coinSpecific.baseAddress === selectedAddress
   })
 
   let label = ''
   let type
   if (keyring) {
-    type = keyring.type
-    if (type !== 'HD Key Tree') {
-      if (type.toLowerCase().search('hardware') !== -1) {
-        label = this.context.t('hardware')
-      } else {
-        label = this.context.t('imported')
-      }
-    }
+      label = this.context.t('imported')
   }
 
   return h('div.wallet-view.flex-column', {

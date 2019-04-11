@@ -4,12 +4,10 @@ const EthQuery = require('eth-query')
 const log = require('loglevel')
 const pify = require('pify')
 const {
-  ROPSTEN,
-  RINKEBY,
   KOVAN,
   MAINNET,
 } = require('./network/enums')
-const INFURA_PROVIDER_TYPES = [ROPSTEN, RINKEBY, KOVAN, MAINNET]
+const INFURA_PROVIDER_TYPES = [KOVAN, MAINNET]
 
 
 class RecentBlocksController {

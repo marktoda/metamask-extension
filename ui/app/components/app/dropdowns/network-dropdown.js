@@ -141,28 +141,6 @@ NetworkDropdown.prototype.render = function () {
     h(
       DropdownMenuItem,
       {
-        key: 'ropsten',
-        closeMenu: () => this.props.hideNetworkDropdown(),
-        onClick: () => this.handleClick('ropsten'),
-        style: dropdownMenuItemStyle,
-      },
-      [
-        providerType === 'ropsten' ? h('i.fa.fa-check') : h('.network-check__transparent', '✓'),
-        h(NetworkDropdownIcon, {
-          backgroundColor: '#ff4a8d', // $wild-strawberry
-          isSelected: providerType === 'ropsten',
-        }),
-        h('span.network-name-item', {
-          style: {
-            color: providerType === 'ropsten' ? '#ffffff' : '#9b9b9b',
-          },
-        }, this.context.t('ropsten')),
-      ]
-    ),
-
-    h(
-      DropdownMenuItem,
-      {
         key: 'kovan',
         closeMenu: () => this.props.hideNetworkDropdown(),
         onClick: () => this.handleClick('kovan'),
@@ -182,27 +160,6 @@ NetworkDropdown.prototype.render = function () {
       ]
     ),
 
-    h(
-      DropdownMenuItem,
-      {
-        key: 'rinkeby',
-        closeMenu: () => this.props.hideNetworkDropdown(),
-        onClick: () => this.handleClick('rinkeby'),
-        style: dropdownMenuItemStyle,
-      },
-      [
-        providerType === 'rinkeby' ? h('i.fa.fa-check') : h('.network-check__transparent', '✓'),
-        h(NetworkDropdownIcon, {
-          backgroundColor: '#f6c343', // $saffron
-          isSelected: providerType === 'rinkeby',
-        }),
-        h('span.network-name-item', {
-          style: {
-            color: providerType === 'rinkeby' ? '#ffffff' : '#9b9b9b',
-          },
-        }, this.context.t('rinkeby')),
-      ]
-    ),
 
     h(
       DropdownMenuItem,
@@ -279,12 +236,8 @@ NetworkDropdown.prototype.getNetworkName = function () {
 
   if (providerName === 'mainnet') {
     name = this.context.t('mainnet')
-  } else if (providerName === 'ropsten') {
-    name = this.context.t('ropsten')
   } else if (providerName === 'kovan') {
     name = this.context.t('kovan')
-  } else if (providerName === 'rinkeby') {
-    name = this.context.t('rinkeby')
   } else {
     name = provider.nickname || this.context.t('unknownNetwork')
   }

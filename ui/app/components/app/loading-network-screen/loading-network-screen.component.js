@@ -39,12 +39,8 @@ export default class LoadingNetworkScreen extends PureComponent {
 
     if (providerName === 'mainnet') {
       name = this.context.t('connectingToMainnet')
-    } else if (providerName === 'ropsten') {
-      name = this.context.t('connectingToRopsten')
     } else if (providerName === 'kovan') {
       name = this.context.t('connectingToKovan')
-    } else if (providerName === 'rinkeby') {
-      name = this.context.t('connectingToRinkeby')
     } else {
       name = this.context.t('connectingTo', [providerId])
     }
@@ -124,7 +120,7 @@ export default class LoadingNetworkScreen extends PureComponent {
       <div className="loading-overlay">
         <div
           className="page-container__header-close"
-          onClick={() => setProviderType(lastSelectedProvider || 'ropsten')}
+          onClick={() => setProviderType(lastSelectedProvider || 'kovan')}
         />
         <div className="loading-overlay__container">
           { this.state.showErrorScreen
