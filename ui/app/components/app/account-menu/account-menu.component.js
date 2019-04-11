@@ -58,7 +58,7 @@ export default class AccountMenu extends PureComponent {
       keyrings,
       showAccountDetail,
     } = this.props
-    const accountOrder = keyrings.reduce((list, keyring) => list.concat(keyring.accounts), [])
+    const accountOrder = keyrings.reduce((list, keyring) => list.concat([keyring.coinSpecific.baseAddress]), [])
 
     return accountOrder.filter(address => !!identities[address]).map(address => {
       const identity = identities[address]
@@ -68,7 +68,7 @@ export default class AccountMenu extends PureComponent {
       const simpleAddress = identity.address.substring(2).toLowerCase()
 
       const keyring = keyrings.find(kr => {
-        return kr.accounts.includes(simpleAddress) || kr.accounts.includes(identity.address)
+        return kr.coinSpecific.baseAddress === simpleAddress
       })
 
       return (
@@ -113,8 +113,7 @@ export default class AccountMenu extends PureComponent {
   renderRemoveAccount (keyring, identity) {
     const { t } = this.context
     // Any account that's not from the HD wallet Keyring can be removed
-    const { type } = keyring
-    const isRemovable = type !== 'HD Key Tree'
+    const isRemovable = false
 
     return isRemovable && (
       <Tooltip
