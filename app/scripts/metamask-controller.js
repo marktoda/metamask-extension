@@ -634,7 +634,8 @@ module.exports = class MetamaskController extends EventEmitter {
   async submitPassword (password) {
     await this.keyringController.submitPassword(password)
     const accounts = await this.keyringController.getAccounts()
-    await this.preferencesController.syncAddresses(accounts)
+    const accountInfo = await this.keyringController.getKeyringsByType('any')
+    await this.preferencesController.syncAddresses(accounts, accountInfo)
     // LOOK FROM HERE DOWN
     await this.balancesController.updateAllBalances()
     await this.txController.pendingTxTracker.updatePendingTxs()

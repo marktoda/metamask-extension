@@ -271,17 +271,27 @@ class PreferencesController {
    * @param {string[]} addresses An array of hex addresses
    *
    */
-  addAddresses (addresses) {
+  addAddresses (addresses, accountInfo) {
     const identities = this.store.getState().identities
     const accountTokens = this.store.getState().accountTokens
     addresses.forEach((address) => {
       // skip if already exists
-      if (identities[address]) return
+      if (identities[address] && !identities[address].isDefaultName) return
       // add missing identity
       const identityCount = Object.keys(identities).length
 
       accountTokens[address] = {}
-      identities[address] = { name: `Account ${identityCount + 1}`, address }
+      let name = `Account ${identityCount + 1}`
+      let isDefaultName = true;
+      if (accountInfo) {
+        const addressesInfo = accountInfo.filter((info) => info.coinSpecific.baseAddress === address);
+        if (addressesInfo.length > 0) {
+          isDefaultName = false;
+          name = addressesInfo[0].label
+        }
+      }
+
+      identities[address] = { name: name, address, isDefaultName }
     })
     this.store.updateState({ identities, accountTokens })
   }
@@ -293,7 +303,7 @@ class PreferencesController {
    * @param {Array<string>} addresses known to the vault.
    * @returns {Promise<string>} selectedAddress the selected address.
    */
-  syncAddresses (addresses) {
+  syncAddresses (addresses, accountInfo) {
     const { identities, lostIdentities } = this.store.getState()
     const newlyLost = {}
     Object.keys(identities).forEach((identity) => {
@@ -306,9 +316,6 @@ class PreferencesController {
     // Identities are no longer present.
     if (Object.keys(newlyLost).length > 0) {
 
-      // Notify our servers:
-      if (this.diagnostics) this.diagnostics.reportOrphans(newlyLost)
-
       // store lost accounts
       for (const key in newlyLost) {
         lostIdentities[key] = newlyLost[key]
@@ -316,7 +323,7 @@ class PreferencesController {
     }
 
     this.store.updateState({ identities, lostIdentities })
-    this.addAddresses(addresses)
+    this.addAddresses(addresses, accountInfo)
 
     // If the selected account is no longer valid,
     // select an arbitrary other account:
