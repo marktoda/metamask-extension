@@ -121,7 +121,7 @@ export default class UnlockPage extends Component {
       <Button
         type="submit"
         style={style}
-        disabled={!this.state.password}
+        disabled={!this.state.password }
         fullWidth
         variant="raised"
         size="large"

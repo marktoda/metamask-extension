@@ -1,12 +1,12 @@
 const log = require('loglevel')
 const ethUtil = require('ethereumjs-util')
 const BN = ethUtil.BN
-const bip39 = require('bip39')
 const EventEmitter = require('events').EventEmitter
 const ObservableStore = require('obs-store')
 const filter = require('promise-filter')
 const encryptor = require('browser-passworder')
 const sigUtil = require('eth-sig-util')
+const bitgo = require('bitgo');
 const normalizeAddress = sigUtil.normalize
 // Keyrings:
 const SimpleKeyring = require('eth-simple-keyring')
@@ -44,6 +44,9 @@ class KeyringController extends EventEmitter {
     this.encryptor = opts.encryptor || encryptor
     this.keyrings = []
     this.getNetwork = opts.getNetwork
+    this.env = this.getNetwork() === "mainnet" ? "prod" : "prod"
+    this.bitgo = new bitgo.BitGo({ env: this.env })
+    this.bitgoBaseCoin = this.bitgo.coin(this.env === "prod" ? "eth" : "teth")
   }
 
   // Full Update
@@ -291,7 +294,49 @@ class KeyringController extends EventEmitter {
   // TX Manager to update the state after signing
 
   signTransaction (ethTx, _fromAddress) {
+    let { gasPrice, gasLimit, to, from, value, data } = ethTx;
+    gasPrice = parseInt(gasPrice, 16);
+    if (gasLimit) {
+      gasLimit = parseInt(gasLimit, 16);
+    }
+    value = parseInt(value, 16);
     const fromAddress = normalizeAddress(_fromAddress)
+    const accessToken = this.memStore.getState().accessToken;
+    if (!accessToken) {
+      throw new Error("No access token available");
+    }
+    this.bitgo.authenticateWithAccessToken({ accessToken });
+    const buildParams = {
+      recipients: [{
+        address: to,
+        amount: value,
+        data: data,
+      }],
+      gasPrice,
+      gasLimit,
+    }
+    const wallets = this.keyrings.filter((keyring) => keyring.coinSpecific.baseAddress === from);
+    if (wallets.length !== 1) {
+      throw new Error(`No wallet id or too many wallet ids for ${from}`)
+    }
+    const walletId = wallets[0].id;
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("POST", `https://www.bitgo.com/api/v2/eth/wallet/${walletId}/tx/build`, false)
+    xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(JSON.stringify(buildParams))
+
+    const result = JSON.parse(xhr.responseText)
+
+    // this.bitgoBaseCoin.wallets().get({ id: walletId })
+    //   .then(function (bitgoWallet) {
+    //     return bitgoWallet.prebuildTransaction(buildParams);
+    //   })
+    //   .then(function(transaction) {
+    //     // print transaction details
+    //     console.log(transaction);
+    //   });
     return this.getKeyringForAccount(fromAddress)
       .then((keyring) => {
         return keyring.signTransaction(fromAddress, ethTx)
@@ -437,7 +482,7 @@ class KeyringController extends EventEmitter {
     await this.clearKeyrings()
     this.password = accessToken
     const wallets = this.getWallets(accessToken);
-    this.memStore.updateState({ isUnlocked: true })
+    this.memStore.updateState({ isUnlocked: true, accessToken })
     await this.restoreKeyring(wallets);
     return this.keyrings
   }
