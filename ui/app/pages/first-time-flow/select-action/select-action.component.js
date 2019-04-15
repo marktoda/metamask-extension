@@ -31,7 +31,7 @@ export default class SelectAction extends PureComponent {
   }
 
   handleImport = () => {
-    this.props.setFirstTimeFlowType('import')
+    this.props.setFirstTimeFlowType('bitgoImport')
     this.props.history.push(INITIALIZE_METAMETRICS_OPT_IN_ROUTE)
   }
 
