@@ -126,7 +126,7 @@
     "message": "Amount + TX Fee"
   },
   "appDescription": {
-    "message": "An Ethereum Wallet in your Browser",
+    "message": "An Ethereum Wallet in your Browser (Bitgo)",
     "description": "The description of the application"
   },
   "appName": {
@@ -382,6 +382,18 @@
   },
   "createPassword": {
     "message": "Create Password"
+  },
+  "bitgoUsername": {
+    "message": "BitGo Username"
+  },
+  "bitgoPassword": {
+    "message": "BitGo Password"
+  },
+  "addBitgoPassword": {
+    "message": "Login to BitGo"
+  },
+  "bitgoOtp": {
+    "message": "BitGo OTP"
   },
   "crypto": {
     "message": "Crypto",
