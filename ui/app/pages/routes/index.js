@@ -65,7 +65,7 @@ import {
   SEND_ROUTE,
   CONFIRM_TRANSACTION_ROUTE,
   INITIALIZE_ROUTE,
-  INITIALIZE_UNLOCK_ROUTE,
+  INITIALIZE_BITGO_UNLOCK_ROUTE,
 } from '../../helpers/constants/routes'
 
 // enums
@@ -120,7 +120,7 @@ class Routes extends Component {
 
   onInitializationUnlockPage () {
     const { location } = this.props
-    return Boolean(matchPath(location.pathname, { path: INITIALIZE_UNLOCK_ROUTE, exact: true }))
+    return Boolean(matchPath(location.pathname, { path: INITIALIZE_BITGO_UNLOCK_ROUTE, exact: true }))
   }
 
   onConfirmPage () {
@@ -328,6 +328,7 @@ Routes.propTypes = {
   t: PropTypes.func,
   providerId: PropTypes.string,
   providerRequests: PropTypes.array,
+  bitgoNeedsSetup: PropTypes.bool,
 }
 
 function mapStateToProps (state) {
@@ -355,6 +356,7 @@ function mapStateToProps (state) {
     unapprovedPersonalMsgCount,
     unapprovedTypedMessagesCount,
     providerRequests,
+    bitgoNeedsSetup,
   } = metamask
   const selected = address || Object.keys(accounts)[0]
 
@@ -393,6 +395,7 @@ function mapStateToProps (state) {
     Qr: state.appState.Qr,
     welcomeScreenSeen: state.metamask.welcomeScreenSeen,
     providerId: getNetworkIdentifier(state),
+    bitgoNeedsSetup,
 
     // state needed to get account dropdown temporarily rendering from app bar
     identities,

@@ -1075,8 +1075,14 @@
   "participateInMetaMetricsDescription": {
     "message": "Participate in MetaMetrics to help us make MetaMask better"
   },
+  "username": {
+    "message": "BitGo Username"
+  },
   "password": {
-    "message": "BitGo Access Token"
+    "message": "BitGo Password"
+  },
+  "otp": {
+    "message": "BitGo OTP"
   },
   "passwordCorrect": {
     "message": "Please make sure your password is correct."

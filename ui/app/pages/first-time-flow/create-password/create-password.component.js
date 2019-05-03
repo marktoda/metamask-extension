@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Switch, Route } from 'react-router-dom'
 import NewAccount from './new-account'
-import BitgoAccount from './bitgo-account'
+//import BitgoAccount from './bitgo-account'
 import ImportWithSeedPhrase from './import-with-seed-phrase'
 import {
   INITIALIZE_CREATE_PASSWORD_ROUTE,
@@ -66,7 +66,7 @@ export default class CreatePassword extends PureComponent {
               />
             )}
           />
-          <Route
+          {/* <Route
             exact
             path={INITIALIZE_IMPORT_BITGO_ROUTE}
             render={props => (
@@ -75,7 +75,7 @@ export default class CreatePassword extends PureComponent {
                 onSubmit={onCreateNewAccount}
               />
             )}
-          />
+          /> */}
         </Switch>
       </div>
     )

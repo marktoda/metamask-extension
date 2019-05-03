@@ -28,6 +28,8 @@ export default class UnlockPage extends Component {
 
     this.state = {
       password: '',
+      username: '',
+      otp: '',
       error: null,
     }
 
@@ -47,10 +49,10 @@ export default class UnlockPage extends Component {
     event.preventDefault()
     event.stopPropagation()
 
-    const { password } = this.state
+    const { username, password, otp } = this.state
     const { onSubmit, forceUpdateMetamaskState, showOptInModal } = this.props
 
-    if (password === '' || this.submitting) {
+    if (password === '' || username === '' || otp === '' || this.submitting) {
       return
     }
 
@@ -58,7 +60,7 @@ export default class UnlockPage extends Component {
     this.submitting = true
 
     try {
-      await onSubmit(password)
+      await onSubmit(username, password, otp)
       const newState = await forceUpdateMetamaskState()
       this.context.metricsEvent({
         eventOpts: {
@@ -79,7 +81,7 @@ export default class UnlockPage extends Component {
           eventOpts: {
             category: 'Navigation',
             action: 'Unlock',
-            name: 'Incorrect Passowrd',
+            name: 'Incorrect Password',
           },
           customVariables: {
             numberOfTokens: newState.tokens.length,
@@ -104,6 +106,14 @@ export default class UnlockPage extends Component {
       x: boundingRect.left + coordinates.left - element.scrollLeft,
       y: boundingRect.top + coordinates.top - element.scrollTop,
     })
+  }
+
+  handleNonPasswordInputChange ({ target }) {
+    if (target.id === 'username') {
+      this.setState({ username: target.value, error: null })
+    } else if (target.id === 'otp') {
+      this.setState({ otp: target.value, error: null })
+    }
   }
 
   renderSubmitButton () {
@@ -134,7 +144,7 @@ export default class UnlockPage extends Component {
   }
 
   render () {
-    const { password, error } = this.state
+    const { username, password, otp, error } = this.state
     const { t } = this.context
     const { onImport, onRestore } = this.props
 
@@ -157,14 +167,34 @@ export default class UnlockPage extends Component {
             onSubmit={this.handleSubmit}
           >
             <TextField
+              id="username"
+              label={t('username')}
+              type="text"
+              value={username}
+              onChange={event => this.handleNonPasswordInputChange(event)}
+              autoFocus
+              material
+              fullWidth
+            />
+
+            <TextField
               id="password"
               label={t('password')}
               type="password"
               value={password}
               onChange={event => this.handleInputChange(event)}
-              error={error}
-              autoFocus
               autoComplete="current-password"
+              material
+              fullWidth
+            />
+
+            <TextField
+              id="otp"
+              label={t('otp')}
+              type="text"
+              value={otp}
+              onChange={event => this.handleNonPasswordInputChange(event)}
+              error={error}
               material
               fullWidth
             />

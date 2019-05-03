@@ -23,7 +23,7 @@ const WELCOME_ROUTE = '/welcome'
 
 const INITIALIZE_ROUTE = '/initialize'
 const INITIALIZE_WELCOME_ROUTE = '/initialize/welcome'
-const INITIALIZE_UNLOCK_ROUTE = '/initialize/unlock'
+const INITIALIZE_BITGO_UNLOCK_ROUTE = '/initialize/bitgo/unlock'
 const INITIALIZE_CREATE_PASSWORD_ROUTE = '/initialize/create-password'
 const INITIALIZE_IMPORT_ACCOUNT_ROUTE = '/initialize/create-password/import-account'
 const INITIALIZE_IMPORT_WITH_SEED_PHRASE_ROUTE = '/initialize/create-password/import-with-seed-phrase'
@@ -34,7 +34,6 @@ const INITIALIZE_SEED_PHRASE_ROUTE = '/initialize/seed-phrase'
 const INITIALIZE_END_OF_FLOW_ROUTE = '/initialize/end-of-flow'
 const INITIALIZE_CONFIRM_SEED_PHRASE_ROUTE = '/initialize/seed-phrase/confirm'
 const INITIALIZE_METAMETRICS_OPT_IN_ROUTE = '/initialize/metametrics-opt-in'
-
 const CONFIRM_TRANSACTION_ROUTE = '/confirm-transaction'
 const CONFIRM_SEND_ETHER_PATH = '/send-ether'
 const CONFIRM_SEND_TOKEN_PATH = '/send-token'
@@ -64,7 +63,6 @@ module.exports = {
   WELCOME_ROUTE,
   INITIALIZE_ROUTE,
   INITIALIZE_WELCOME_ROUTE,
-  INITIALIZE_UNLOCK_ROUTE,
   INITIALIZE_CREATE_PASSWORD_ROUTE,
   INITIALIZE_IMPORT_ACCOUNT_ROUTE,
   INITIALIZE_IMPORT_WITH_SEED_PHRASE_ROUTE,
@@ -88,4 +86,6 @@ module.exports = {
   COMPANY_ROUTE,
   GENERAL_ROUTE,
   ABOUT_US_ROUTE,
+  INITIALIZE_BITGO_UNLOCK_ROUTE,
+  //BITGO_WALLET_INITIALIZATION,
 }

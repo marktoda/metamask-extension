@@ -366,14 +366,14 @@ function goHome () {
 
 // async actions
 
-function tryUnlockMetamask (password) {
+function tryUnlockMetamask (username, password, otp) {
   return dispatch => {
     dispatch(actions.showLoadingIndication())
     dispatch(actions.unlockInProgress())
     log.debug(`background.submitPassword`)
 
     return new Promise((resolve, reject) => {
-      background.submitPassword(password, error => {
+      background.submitPassword(username, password, otp, error => {
         if (error) {
           return reject(error)
         }
@@ -1157,12 +1157,12 @@ function clearSend () {
 }
 
 
-function sendTx (txData) {
+function sendTx (txData, password, otp) {
   log.info(`actions - sendTx: ${JSON.stringify(txData.txParams)}`)
   return (dispatch, getState) => {
     log.debug(`actions calling background.approveTransaction`)
     window.onbeforeunload = null
-    background.approveTransaction(txData.id, (err) => {
+    background.approveTransaction(txData.id, password, otp, (err) => {
       if (err) {
         dispatch(actions.txError(err))
         return log.error(err.message)
@@ -1219,14 +1219,13 @@ function updateTransaction (txData) {
   }
 }
 
-function updateAndApproveTx (txData) {
-  log.info('actions: updateAndApproveTx: ' + JSON.stringify(txData))
+function updateAndApproveTx (txData, password, otp) {
   return (dispatch, getState) => {
     log.debug(`actions calling background.updateAndApproveTx`)
     dispatch(actions.showLoadingIndication())
     window.onbeforeunload = null
     return new Promise((resolve, reject) => {
-      background.updateAndApproveTransaction(txData, err => {
+      background.updateAndApproveTransaction(txData, password, otp, err => {
         dispatch(actions.updateTransactionParams(txData.id, txData.txParams))
         dispatch(actions.clearSend())
 

@@ -631,11 +631,13 @@ module.exports = class MetamaskController extends EventEmitter {
    * @param {string} password - The user's password
    * @returns {Promise<object>} - The keyringController update.
    */
-  async submitPassword (password) {
-    await this.keyringController.submitPassword(password)
+  async submitPassword (username, password, otp) {
+    await this.keyringController.submitPassword(username, password, otp)
     const accounts = await this.keyringController.getAccounts()
     const accountInfo = await this.keyringController.getKeyringsByType('any')
+
     await this.preferencesController.syncAddresses(accounts, accountInfo)
+
     // LOOK FROM HERE DOWN
     await this.balancesController.updateAllBalances()
     await this.txController.pendingTxTracker.updatePendingTxs()

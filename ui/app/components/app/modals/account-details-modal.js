@@ -58,7 +58,7 @@ AccountDetailsModal.prototype.render = function () {
   const { name, address } = selectedIdentity
 
   const keyring = keyrings.find((kr) => {
-    return kr.accounts.includes(address)
+    return kr.coinSpecific.baseAddress === address
   })
 
   let exportPrivateKeyFeatureEnabled = true

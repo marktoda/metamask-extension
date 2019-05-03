@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import Button from '../../../../components/ui/button'
+import Button from '../../../components/ui/button'
 import {
   INITIALIZE_SEED_PHRASE_ROUTE,
   INITIALIZE_IMPORT_WITH_SEED_PHRASE_ROUTE,
   INITIALIZE_SELECT_ACTION_ROUTE,
-} from '../../../../helpers/constants/routes'
-import TextField from '../../../../components/ui/text-field'
+} from '../../../helpers/constants/routes'
+import TextField from '../../../components/ui/text-field'
 
 export default class NewAccount extends PureComponent {
   static contextTypes = {

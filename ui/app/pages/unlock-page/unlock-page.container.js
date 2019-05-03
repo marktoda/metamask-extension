@@ -23,7 +23,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     forgotPassword: () => dispatch(forgotPassword()),
-    tryUnlockMetamask: password => dispatch(tryUnlockMetamask(password)),
+    tryUnlockMetamask: (username, password, otp) => dispatch(tryUnlockMetamask(username, password, otp)),
     markPasswordForgotten: () => dispatch(markPasswordForgotten()),
     forceUpdateMetamaskState: () => forceUpdateMetamaskState(dispatch),
     showOptInModal: () => dispatch(showModal({ name: 'METAMETRICS_OPT_IN_MODAL' })),
@@ -43,8 +43,8 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
     }
   }
 
-  const onSubmit = async password => {
-    await tryUnlockMetamask(password)
+  const onSubmit = async (username, password, otp) => {
+    await tryUnlockMetamask(username, password, otp)
     history.push(DEFAULT_ROUTE)
   }
 

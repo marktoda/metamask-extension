@@ -3,9 +3,11 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { ENVIRONMENT_TYPE_NOTIFICATION } from '../../../../app/scripts/lib/enums'
 import { getEnvironmentType } from '../../../../app/scripts/lib/util'
+import getCaretCoordinates from 'textarea-caret'
 import ConfirmPageContainer, { ConfirmDetailRow } from '../../components/app/confirm-page-container'
 import { isBalanceSufficient } from '../../components/app/send/send.utils'
 import { DEFAULT_ROUTE, CONFIRM_TRANSACTION_ROUTE } from '../../helpers/constants/routes'
+import TextField from '../../components/ui/text-field'
 import {
   INSUFFICIENT_FUNDS_ERROR_KEY,
   TRANSACTION_ERROR_KEY,
@@ -97,6 +99,9 @@ export default class ConfirmTransactionBase extends Component {
   state = {
     submitting: false,
     submitError: null,
+    password: '',
+    otp: '',
+    error: null,
   }
 
   componentDidUpdate () {
@@ -158,6 +163,19 @@ export default class ConfirmTransactionBase extends Component {
     }
   }
 
+  handleInputChange ({ target }) {
+    this.setState({ password: target.value, error: null })
+  }
+
+  handleNonPasswordInputChange ({ target }) {
+    if (target.id === 'username') {
+      this.setState({ username: target.value, error: null })
+    } else if (target.id === 'otp') {
+      this.setState({ otp: target.value, error: null })
+    }
+  }
+
+
   handleEditGas () {
     const { onEditGas, showCustomizeGasModal, actionKey, txData: { origin }, methodData = {} } = this.props
 
@@ -196,6 +214,7 @@ export default class ConfirmTransactionBase extends Component {
       hideFiatConversion,
     } = this.props
 
+    const { password, otp, error } = this.state
     if (hideDetails) {
       return null
     }
@@ -236,6 +255,31 @@ export default class ConfirmTransactionBase extends Component {
               primaryValueTextColor="#2f9ae0"
             />
           </div>
+
+          <div>
+            <TextField
+              id="password"
+              label={this.context.t('password')}
+              type="password"
+              value={password}
+              onChange={event => this.handleInputChange(event)}
+              autoComplete="current-password"
+              material
+              fullWidth
+            />
+          </div>
+          <div>
+          <TextField
+            id="otp"
+            label={this.context.t('otp')}
+            type="text"
+            value={otp}
+            onChange={event => this.handleNonPasswordInputChange(event)}
+            error={error}
+            material
+            fullWidth
+          />
+        </div>
         </div>
       )
     )
@@ -357,9 +401,13 @@ export default class ConfirmTransactionBase extends Component {
   }
 
   handleSubmit () {
-    const { metricsEvent } = this.context
-    const { txData: { origin }, sendTransaction, clearConfirmTransaction, txData, history, onSubmit, actionKey, metaMetricsSendCount = 0, setMetaMetricsSendCount, methodData = {} } = this.props
-    const { submitting } = this.state
+    const {metricsEvent} = this.context
+    const {txData: {origin}, sendTransaction, clearConfirmTransaction, txData, history, onSubmit, actionKey, metaMetricsSendCount = 0, setMetaMetricsSendCount, methodData = {}} = this.props
+    const {
+      submitting,
+      password,
+      otp
+    } = this.state;
 
     if (submitting) {
       return
@@ -392,7 +440,7 @@ export default class ConfirmTransactionBase extends Component {
                 })
               })
           } else {
-            sendTransaction(txData)
+            sendTransaction(txData, password, otp)
               .then(() => {
                 clearConfirmTransaction()
                 this.setState({
