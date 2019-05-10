@@ -1528,6 +1528,7 @@ module.exports = class MetamaskController extends EventEmitter {
     if (url) this.platform.openWindow({ url })
   }
 
+
   /**
    * A method for triggering a shapeshift currency transfer.
    * @param {string} depositAddress - The address to deposit to.

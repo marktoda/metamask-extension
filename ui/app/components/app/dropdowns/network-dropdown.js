@@ -49,6 +49,12 @@ function mapDispatchToProps (dispatch) {
     },
     showNetworkDropdown: () => dispatch(actions.showNetworkDropdown()),
     hideNetworkDropdown: () => dispatch(actions.hideNetworkDropdown()),
+    lockMetamask: () => {
+      dispatch(actions.lockMetamask())
+      dispatch(actions.hideWarning())
+      dispatch(actions.hideSidebar())
+      dispatch(actions.toggleAccountMenu())
+    },
   }
 }
 
@@ -167,7 +173,7 @@ NetworkDropdown.prototype.render = function () {
 }
 
 NetworkDropdown.prototype.handleClick = function (newProviderType) {
-  const { provider: { type: providerType }, setProviderType } = this.props
+  const { provider: { type: providerType }, setProviderType, lockMetamask } = this.props
   const { metricsEvent } = this.context
 
   metricsEvent({
@@ -182,6 +188,7 @@ NetworkDropdown.prototype.handleClick = function (newProviderType) {
     },
   })
   setProviderType(newProviderType)
+  lockMetamask();
 }
 
 NetworkDropdown.prototype.getNetworkName = function () {

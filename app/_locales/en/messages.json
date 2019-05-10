@@ -563,7 +563,7 @@
     "message": "Expand View"
   },
   "exportPrivateKey": {
-    "message": "Export Private Key"
+    "message": "View on BitGo"
   },
   "exportPrivateKeyWarning": {
     "message": "Export private keys at your own risk."

@@ -298,7 +298,6 @@ class KeyringController extends EventEmitter {
       gasLimit = parseInt(gasLimit, 16);
     }
     value = new BN(ethUtil.stripHexPrefix(value), 16);
-    const fromAddress = normalizeAddress(_fromAddress)
     const accessToken = this.memStore.getState().accessToken;
     if (!accessToken) {
       throw new Error("No access token available");
@@ -322,7 +321,6 @@ class KeyringController extends EventEmitter {
 
     const wallet = await this.bitgoBaseCoin.wallets().get({ id: walletId })
     const transaction = await wallet.send(buildParams)
-    console.log(transaction)
     return transaction.txid
   }
 
@@ -468,7 +466,6 @@ class KeyringController extends EventEmitter {
     await this.clearKeyrings()
     this.password = accessToken
     const wallets = await this.getWallets(accessToken);
-    console.log(wallets);
     this.memStore.updateState({ isUnlocked: true, accessToken })
     await this.restoreKeyring(wallets);
     return this.keyrings

@@ -93,6 +93,7 @@ export default class UnlockPage extends Component {
   }
 
   handleInputChange ({ target }) {
+    console.log(target);
     this.setState({ password: target.value, error: null })
 
     // tell mascot to look at page action
@@ -103,6 +104,13 @@ export default class UnlockPage extends Component {
       x: boundingRect.left + coordinates.left - element.scrollLeft,
       y: boundingRect.top + coordinates.top - element.scrollTop,
     })
+  }
+
+  otpOnKeyDown (e) {
+    const keyCode = e.keyCode
+    if (keyCode === 13) {
+      this.handleSubmit(e);
+    }
   }
 
   handleNonPasswordInputChange ({ target }) {
@@ -128,7 +136,7 @@ export default class UnlockPage extends Component {
       <Button
         type="submit"
         style={style}
-        disabled={!this.state.password }
+        disabled={!(this.state.password && this.state.username && this.state.otp) }
         fullWidth
         variant="raised"
         size="large"
@@ -191,6 +199,7 @@ export default class UnlockPage extends Component {
               type="text"
               value={otp}
               onChange={event => this.handleNonPasswordInputChange(event)}
+              onKeyDown={event => this.otpOnKeyDown(event)}
               error={error}
               material
               fullWidth

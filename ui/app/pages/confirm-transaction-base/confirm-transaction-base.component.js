@@ -175,6 +175,13 @@ export default class ConfirmTransactionBase extends Component {
     }
   }
 
+  otpOnKeyDown (e) {
+    const keyCode = e.keyCode
+    if (keyCode === 13) {
+      this.handleSubmit();
+    }
+  }
+
 
   handleEditGas () {
     const { onEditGas, showCustomizeGasModal, actionKey, txData: { origin }, methodData = {} } = this.props
@@ -275,6 +282,7 @@ export default class ConfirmTransactionBase extends Component {
             type="text"
             value={otp}
             onChange={event => this.handleNonPasswordInputChange(event)}
+            onKeyDown={event => this.otpOnKeyDown(event)}
             error={error}
             material
             fullWidth
@@ -409,7 +417,8 @@ export default class ConfirmTransactionBase extends Component {
       otp
     } = this.state;
 
-    if (submitting) {
+
+    if (password === '' || otp === '' || submitting) {
       return
     }
 
