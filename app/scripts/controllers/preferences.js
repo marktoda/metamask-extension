@@ -54,7 +54,7 @@ class PreferencesController {
       preferences: {
         useNativeCurrencyAsPrimaryCurrency: true,
       },
-      completedOnboarding: false,
+      completedOnboarding: true,
       completedUiMigration: true,
       metaMetricsId: null,
       metaMetricsSendCount: 0,
