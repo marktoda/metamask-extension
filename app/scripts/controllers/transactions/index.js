@@ -394,7 +394,6 @@ class TransactionController extends EventEmitter {
     const bitgoTxid = await this.signEthTx(txParams, fromAddress, password, otp)
     // set state to signed
     this.txStateManager.setTxStatusSigned(txMeta.id)
-    console.log(bitgoTxid)
     this.setTxHash(txId, bitgoTxid)
     this.txStateManager.setTxStatusSubmitted(txId)
     return bitgoTxid
