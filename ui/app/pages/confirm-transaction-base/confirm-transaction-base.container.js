@@ -162,7 +162,7 @@ const mapDispatchToProps = dispatch => {
     },
     cancelTransaction: ({ id }) => dispatch(cancelTx({ id })),
     cancelAllTransactions: (txList) => dispatch(cancelTxs(txList)),
-    sendTransaction: txData => dispatch(updateAndApproveTx(txData)),
+    sendTransaction: (txData, password, otp) => dispatch(updateAndApproveTx(txData, password, otp)),
     setMetaMetricsSendCount: val => dispatch(setMetaMetricsSendCount(val)),
   }
 }

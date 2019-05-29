@@ -28,6 +28,8 @@ export default class UnlockPage extends Component {
 
     this.state = {
       password: '',
+      username: '',
+      otp: '',
       error: null,
     }
 
@@ -47,10 +49,10 @@ export default class UnlockPage extends Component {
     event.preventDefault()
     event.stopPropagation()
 
-    const { password } = this.state
+    const { username, password, otp } = this.state
     const { onSubmit, forceUpdateMetamaskState, showOptInModal } = this.props
 
-    if (password === '' || this.submitting) {
+    if (password === '' || username === '' || otp === '' || this.submitting) {
       return
     }
 
@@ -58,7 +60,7 @@ export default class UnlockPage extends Component {
     this.submitting = true
 
     try {
-      await onSubmit(password)
+      await onSubmit(username, password, otp)
       const newState = await forceUpdateMetamaskState()
       this.context.metricsEvent({
         eventOpts: {
@@ -69,9 +71,6 @@ export default class UnlockPage extends Component {
         isNewVisit: true,
       })
 
-      if (newState.participateInMetaMetrics === null || newState.participateInMetaMetrics === undefined) {
-        showOptInModal()
-      }
     } catch ({ message }) {
       if (message === 'Incorrect password') {
         const newState = await forceUpdateMetamaskState()
@@ -79,7 +78,7 @@ export default class UnlockPage extends Component {
           eventOpts: {
             category: 'Navigation',
             action: 'Unlock',
-            name: 'Incorrect Passowrd',
+            name: 'Incorrect Password',
           },
           customVariables: {
             numberOfTokens: newState.tokens.length,
@@ -106,6 +105,21 @@ export default class UnlockPage extends Component {
     })
   }
 
+  otpOnKeyDown (e) {
+    const keyCode = e.keyCode
+    if (keyCode === 13) {
+      this.handleSubmit(e);
+    }
+  }
+
+  handleNonPasswordInputChange ({ target }) {
+    if (target.id === 'username') {
+      this.setState({ username: target.value, error: null })
+    } else if (target.id === 'otp') {
+      this.setState({ otp: target.value, error: null })
+    }
+  }
+
   renderSubmitButton () {
     const style = {
       backgroundColor: '#f7861c',
@@ -121,7 +135,7 @@ export default class UnlockPage extends Component {
       <Button
         type="submit"
         style={style}
-        disabled={!this.state.password}
+        disabled={!(this.state.password && this.state.username && this.state.otp) }
         fullWidth
         variant="raised"
         size="large"
@@ -134,7 +148,7 @@ export default class UnlockPage extends Component {
   }
 
   render () {
-    const { password, error } = this.state
+    const { username, password, otp, error } = this.state
     const { t } = this.context
     const { onImport, onRestore } = this.props
 
@@ -157,14 +171,35 @@ export default class UnlockPage extends Component {
             onSubmit={this.handleSubmit}
           >
             <TextField
+              id="username"
+              label={t('username')}
+              type="text"
+              value={username}
+              onChange={event => this.handleNonPasswordInputChange(event)}
+              autoFocus
+              material
+              fullWidth
+            />
+
+            <TextField
               id="password"
               label={t('password')}
               type="password"
               value={password}
               onChange={event => this.handleInputChange(event)}
-              error={error}
-              autoFocus
               autoComplete="current-password"
+              material
+              fullWidth
+            />
+
+            <TextField
+              id="otp"
+              label={t('otp')}
+              type="text"
+              value={otp}
+              onChange={event => this.handleNonPasswordInputChange(event)}
+              onKeyDown={event => this.otpOnKeyDown(event)}
+              error={error}
               material
               fullWidth
             />

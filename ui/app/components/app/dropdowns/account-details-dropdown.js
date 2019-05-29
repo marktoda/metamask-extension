@@ -31,6 +31,16 @@ function mapDispatchToProps (dispatch) {
     viewOnEtherscan: (address, network) => {
       global.platform.openWindow({ url: genAccountLink(address, network) })
     },
+    viewOnBitGo: (wallet, network) => {
+      const walletId = wallet.id;
+      const enterprise = wallet.enterprise;
+      const coin = wallet.coin;
+
+      const baseUrl = 'https://' + (network === "1" ? 'www.bitgo.com' : 'test.bitgo.com')
+      const urlExtension = '/enterprise/' + enterprise + '/coin/' + coin + '/' + walletId + '/transactions'
+      console.log(baseUrl + urlExtension)
+      global.platform.openWindow({ url: baseUrl + urlExtension })
+    },
     showRemoveAccountConfirmationModal: (identity) => {
       return dispatch(actions.showModal({ name: 'CONFIRM_REMOVE_ACCOUNT', identity }))
     },
@@ -56,15 +66,16 @@ AccountDetailsDropdown.prototype.render = function () {
     keyrings,
     showAccountDetailModal,
     viewOnEtherscan,
+    viewOnBitGo,
     showRemoveAccountConfirmationModal } = this.props
 
   const address = selectedIdentity.address
 
   const keyring = keyrings.find((kr) => {
-    return kr.accounts.includes(address)
+    return kr.coinSpecific.baseAddress === address
   })
 
-  const isRemovable = keyring.type !== 'HD Key Tree'
+  const isRemovable = false
 
   return h(Menu, { className: 'account-details-dropdown', isShowing: true }, [
     h(CloseArea, {
@@ -117,6 +128,22 @@ AccountDetailsDropdown.prototype.render = function () {
       },
       text: this.context.t('viewOnEtherscan'),
       icon: h(`img`, { src: 'images/open-etherscan.svg', style: { height: '15px' } }),
+    }),
+    h(Item, {
+      onClick: (e) => {
+        e.stopPropagation()
+        this.context.metricsEvent({
+          eventOpts: {
+            category: 'Navigation',
+            action: 'Account Options',
+            name: 'Clicked View on BitGo',
+          },
+        })
+        viewOnBitGo(keyring, network)
+        this.props.onClose()
+      },
+      text: this.context.t('exportPrivateKey'),
+      icon: h(`img`, { src: 'images/BitGo_Shield.png', style: { height: '15px' } }),
     }),
     isRemovable ? h(Item, {
       onClick: (e) => {

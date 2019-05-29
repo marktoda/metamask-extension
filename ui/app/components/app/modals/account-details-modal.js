@@ -24,8 +24,15 @@ function mapDispatchToProps (dispatch) {
   return {
     // Is this supposed to be used somewhere?
     showQrView: (selected, identity) => dispatch(actions.showQrView(selected, identity)),
-    showExportPrivateKeyModal: () => {
-      dispatch(actions.showModal({ name: 'EXPORT_PRIVATE_KEY' }))
+    showExportPrivateKeyModal: (network, wallet) => {
+        const walletId = wallet.id;
+        const enterprise = wallet.enterprise;
+        const coin = wallet.coin;
+
+        const baseUrl = 'https://' + (network === "1" ? 'www.bitgo.com' : 'test.bitgo.com')
+        const urlExtension = '/enterprise/' + enterprise + '/coin/' + coin + '/' + walletId + '/transactions'
+        console.log(baseUrl + urlExtension)
+        global.platform.openWindow({ url: baseUrl + urlExtension })
     },
     hideModal: () => dispatch(actions.hideModal()),
     setAccountLabel: (address, label) => dispatch(actions.setAccountLabel(address, label)),
@@ -58,14 +65,10 @@ AccountDetailsModal.prototype.render = function () {
   const { name, address } = selectedIdentity
 
   const keyring = keyrings.find((kr) => {
-    return kr.accounts.includes(address)
+    return kr.coinSpecific.baseAddress === address
   })
 
   let exportPrivateKeyFeatureEnabled = true
-  // This feature is disabled for hardware wallets
-  if (keyring && keyring.type.search('Hardware') !== -1) {
-    exportPrivateKeyFeatureEnabled = false
-  }
 
   return h(AccountModalContainer, {}, [
       h(EditableLabel, {
@@ -94,7 +97,7 @@ AccountDetailsModal.prototype.render = function () {
       exportPrivateKeyFeatureEnabled ? h(Button, {
         type: 'primary',
         className: 'account-modal__button',
-        onClick: () => showExportPrivateKeyModal(),
+        onClick: () => showExportPrivateKeyModal(network, keyring),
       }, this.context.t('exportPrivateKey')) : null,
 
   ])

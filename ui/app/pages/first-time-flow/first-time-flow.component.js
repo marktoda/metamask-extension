@@ -14,7 +14,7 @@ import {
   INITIALIZE_WELCOME_ROUTE,
   INITIALIZE_CREATE_PASSWORD_ROUTE,
   INITIALIZE_SEED_PHRASE_ROUTE,
-  INITIALIZE_UNLOCK_ROUTE,
+  INITIALIZE_BITGO_UNLOCK_ROUTE,
   INITIALIZE_SELECT_ACTION_ROUTE,
   INITIALIZE_END_OF_FLOW_ROUTE,
   INITIALIZE_METAMETRICS_OPT_IN_ROUTE,
@@ -46,7 +46,7 @@ export default class FirstTimeFlow extends PureComponent {
     }
 
     if (isInitialized && !isUnlocked) {
-      history.push(INITIALIZE_UNLOCK_ROUTE)
+      history.push(INITIALIZE_BITGO_UNLOCK_ROUTE)
       return
     }
   }
@@ -117,7 +117,7 @@ export default class FirstTimeFlow extends PureComponent {
             component={SelectAction}
           />
           <Route
-            path={INITIALIZE_UNLOCK_ROUTE}
+            path={INITIALIZE_BITGO_UNLOCK_ROUTE}
             render={props => (
               <Unlock
                 { ...props }

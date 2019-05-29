@@ -325,11 +325,13 @@ class TransactionController extends EventEmitter {
 
   /**
   updates and approves the transaction
-  @param txMeta {Object}
+   @param txMeta {Object}
+   @param password
+   @param otp
   */
-  async updateAndApproveTransaction (txMeta) {
+  async updateAndApproveTransaction (txMeta, password, otp) {
     this.txStateManager.updateTx(txMeta, 'confTx: user approved transaction')
-    await this.approveTransaction(txMeta.id)
+    await this.approveTransaction(txMeta.id, password, otp)
   }
 
   /**
@@ -340,7 +342,7 @@ class TransactionController extends EventEmitter {
   if any of these steps fails the tx status will be set to failed
     @param txId {number} - the tx's Id
   */
-  async approveTransaction (txId) {
+  async approveTransaction (txId, password, otp) {
     let nonceLock
     try {
       // approve
@@ -359,8 +361,8 @@ class TransactionController extends EventEmitter {
       txMeta.nonceDetails = nonceLock.nonceDetails
       this.txStateManager.updateTx(txMeta, 'transactions#approveTransaction')
       // sign transaction
-      const rawTx = await this.signTransaction(txId)
-      await this.publishTransaction(txId, rawTx)
+      const rawTx = await this.signTransaction(txId, password, otp)
+      // await this.publishTransaction(txId, rawTx)
       // must set transaction to submitted/failed before releasing lock
       nonceLock.releaseLock()
     } catch (err) {
@@ -381,7 +383,7 @@ class TransactionController extends EventEmitter {
     @param txId {number} - the tx's Id
     @returns - rawTx {string}
   */
-  async signTransaction (txId) {
+  async signTransaction (txId, password, otp) {
     const txMeta = this.txStateManager.getTx(txId)
     // add network/chain id
     const chainId = this.getChainId()
@@ -389,11 +391,12 @@ class TransactionController extends EventEmitter {
     // sign tx
     const fromAddress = txParams.from
     const ethTx = new Transaction(txParams)
-    await this.signEthTx(ethTx, fromAddress)
+    const bitgoTxid = await this.signEthTx(txParams, fromAddress, password, otp)
     // set state to signed
     this.txStateManager.setTxStatusSigned(txMeta.id)
-    const rawTx = ethUtil.bufferToHex(ethTx.serialize())
-    return rawTx
+    this.setTxHash(txId, bitgoTxid)
+    this.txStateManager.setTxStatusSubmitted(txId)
+    return bitgoTxid
   }
 
   /**

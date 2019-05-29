@@ -71,7 +71,8 @@
     "activeTab",
     "webRequest",
     "*://*.eth/",
-    "notifications"
+    "notifications",
+    "https://*.bitgo.com/*"
   ],
   "web_accessible_resources": [
     "inpage.js",

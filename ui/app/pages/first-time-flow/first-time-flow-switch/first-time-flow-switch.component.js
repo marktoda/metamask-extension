@@ -5,7 +5,7 @@ import {
   DEFAULT_ROUTE,
   LOCK_ROUTE,
   INITIALIZE_WELCOME_ROUTE,
-  INITIALIZE_UNLOCK_ROUTE,
+  INITIALIZE_BITGO_UNLOCK_ROUTE,
   INITIALIZE_SEED_PHRASE_ROUTE,
   INITIALIZE_METAMETRICS_OPT_IN_ROUTE,
 } from '../../../helpers/constants/routes'
@@ -41,7 +41,7 @@ export default class FirstTimeFlowSwitch extends PureComponent {
     }
 
     if (!isUnlocked) {
-      return <Redirect to={{ pathname: INITIALIZE_UNLOCK_ROUTE }} />
+      return <Redirect to={{ pathname: INITIALIZE_BITGO_UNLOCK_ROUTE }} />
     }
 
     if (seedPhrase) {

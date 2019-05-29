@@ -27,7 +27,6 @@ class PendingTransactionTracker extends EventEmitter {
     this.getPendingTransactions = config.getPendingTransactions
     this.getCompletedTransactions = config.getCompletedTransactions
     this.publishTransaction = config.publishTransaction
-    this.approveTransaction = config.approveTransaction
     this.confirmTransaction = config.confirmTransaction
   }
 
@@ -108,15 +107,11 @@ class PendingTransactionTracker extends EventEmitter {
     // Exponential backoff to limit retries at publishing
     if (txBlockDistance <= Math.pow(2, retryCount) - 1) return
 
-    // Only auto-submit already-signed txs:
-    if (!('rawTx' in txMeta)) return this.approveTransaction(txMeta.id)
-
     const rawTx = txMeta.rawTx
-    const txHash = await this.publishTransaction(rawTx)
 
     // Increment successful tries:
     this.emit('tx:retry', txMeta)
-    return txHash
+    return ''
   }
 
   /**

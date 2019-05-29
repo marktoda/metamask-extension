@@ -66,10 +66,8 @@ function getCurrentKeyring (state) {
   }
 
   const simpleAddress = stripHexPrefix(identity.address).toLowerCase()
-
   const keyring = state.metamask.keyrings.find((kr) => {
-    return kr.accounts.includes(simpleAddress) ||
-      kr.accounts.includes(identity.address)
+    return kr.baseAddress === simpleAddress
   })
 
   return keyring
@@ -298,11 +296,9 @@ function isEthereumNetwork (state) {
   const {
     KOVAN,
     MAINNET,
-    RINKEBY,
-    ROPSTEN,
   } = NETWORK_TYPES
 
-  return [ KOVAN, MAINNET, RINKEBY, ROPSTEN].includes(networkType)
+  return [ KOVAN, MAINNET].includes(networkType)
 }
 
 function preferencesSelector ({ metamask }) {

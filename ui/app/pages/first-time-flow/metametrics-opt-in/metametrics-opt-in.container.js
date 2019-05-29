@@ -6,6 +6,7 @@ import { getFirstTimeFlowTypeRoute } from '../first-time-flow.selectors'
 const firstTimeFlowTypeNameMap = {
   create: 'Selected Create New Wallet',
   'import': 'Selected Import Wallet',
+  'bitgoImport': 'BitGo Import Wallet',
 }
 
 const mapStateToProps = (state) => {

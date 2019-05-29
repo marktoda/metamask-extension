@@ -20,7 +20,7 @@ const createOriginMiddleware = require('./lib/createOriginMiddleware')
 const createLoggerMiddleware = require('./lib/createLoggerMiddleware')
 const providerAsMiddleware = require('eth-json-rpc-middleware/providerAsMiddleware')
 const {setupMultiplex} = require('./lib/stream-utils.js')
-const KeyringController = require('eth-keyring-controller')
+const KeyringController = require('./controllers/bitgoKeyringController');
 const NetworkController = require('./controllers/network')
 const PreferencesController = require('./controllers/preferences')
 const CurrencyController = require('./controllers/currency')
@@ -526,16 +526,12 @@ module.exports = class MetamaskController extends EventEmitter {
       accounts = await keyringController.getAccounts()
       lastBalance = await this.getBalance(accounts[accounts.length - 1], ethQuery)
 
-      const primaryKeyring = keyringController.getKeyringsByType('HD Key Tree')[0]
-      if (!primaryKeyring) {
-        throw new Error('MetamaskController - No HD Key Tree found')
-      }
-
       // seek out the first zero balance
       while (lastBalance !== '0x0') {
-        await keyringController.addNewAccount(primaryKeyring)
-        accounts = await keyringController.getAccounts()
-        lastBalance = await this.getBalance(accounts[accounts.length - 1], ethQuery)
+        // await keyringController.addNewAccount(primaryKeyring)
+        // accounts = await keyringController.getAccounts()
+        accounts = ['0x49d39391fc548692117b7d6ab1928074933c1d4e']
+        lastBalance = 0
       }
 
       // set new identities
@@ -635,17 +631,14 @@ module.exports = class MetamaskController extends EventEmitter {
    * @param {string} password - The user's password
    * @returns {Promise<object>} - The keyringController update.
    */
-  async submitPassword (password) {
-    await this.keyringController.submitPassword(password)
+  async submitPassword (username, password, otp) {
+    await this.keyringController.submitPassword(username, password, otp)
     const accounts = await this.keyringController.getAccounts()
+    const accountInfo = await this.keyringController.getKeyringsByType('any')
 
-    // verify keyrings
-    const nonSimpleKeyrings = this.keyringController.keyrings.filter(keyring => keyring.type !== 'Simple Key Pair')
-    if (nonSimpleKeyrings.length > 1 && this.diagnostics) {
-      await this.diagnostics.reportMultipleKeyrings(nonSimpleKeyrings)
-    }
+    await this.preferencesController.syncAddresses(accounts, accountInfo)
 
-    await this.preferencesController.syncAddresses(accounts)
+    // LOOK FROM HERE DOWN
     await this.balancesController.updateAllBalances()
     await this.txController.pendingTxTracker.updatePendingTxs()
     return this.keyringController.fullUpdate()
@@ -784,26 +777,26 @@ module.exports = class MetamaskController extends EventEmitter {
    * @returns {} keyState
    */
   async addNewAccount () {
-    const primaryKeyring = this.keyringController.getKeyringsByType('HD Key Tree')[0]
-    if (!primaryKeyring) {
-      throw new Error('MetamaskController - No HD Key Tree found')
-    }
-    const keyringController = this.keyringController
-    const oldAccounts = await keyringController.getAccounts()
-    const keyState = await keyringController.addNewAccount(primaryKeyring)
-    const newAccounts = await keyringController.getAccounts()
-
-    await this.verifySeedPhrase()
-
-    this.preferencesController.setAddresses(newAccounts)
-    newAccounts.forEach((address) => {
-      if (!oldAccounts.includes(address)) {
-        this.preferencesController.setSelectedAddress(address)
-      }
-    })
-
-    const {identities} = this.preferencesController.store.getState()
-    return {...keyState, identities}
+    // const primaryKeyring = this.keyringController.getKeyringsByType('HD Key Tree')[0]
+    // if (!primaryKeyring) {
+    //   throw new Error('MetamaskController - No HD Key Tree found')
+    // }
+    // const keyringController = this.keyringController
+    // const oldAccounts = await keyringController.getAccounts()
+    // const keyState = await keyringController.addNewAccount(primaryKeyring)
+    // const newAccounts = await keyringController.getAccounts()
+    //
+    // await this.verifySeedPhrase()
+    //
+    // this.preferencesController.setAddresses(newAccounts)
+    // newAccounts.forEach((address) => {
+    //   if (!oldAccounts.includes(address)) {
+    //     this.preferencesController.setSelectedAddress(address)
+    //   }
+    // })
+    //
+    // const {identities} = this.preferencesController.store.getState()
+    // return {...keyState, identities}
   }
 
   /**
@@ -839,20 +832,16 @@ module.exports = class MetamaskController extends EventEmitter {
 
     const primaryKeyring = this.keyringController.getKeyringsByType('HD Key Tree')[0]
     if (!primaryKeyring) {
-      throw new Error('MetamaskController - No HD Key Tree found')
+      throw new Error('MetamaskController - No BitGo wallets found')
     }
 
-    const serialized = await primaryKeyring.serialize()
-    const seedWords = serialized.mnemonic
-
-    const accounts = await primaryKeyring.getAccounts()
+    const accounts = [primaryKeyring.coinSpecific.baseAddress]
     if (accounts.length < 1) {
       throw new Error('MetamaskController - No accounts found')
     }
-
     try {
-      await seedPhraseVerifier.verifyAccounts(accounts, seedWords)
-      return seedWords
+      // await seedPhraseVerifier.verifyAccounts(accounts, seedWords)
+      return 'a b c d e f'
     } catch (err) {
       log.error(err.message)
       throw err
@@ -1420,8 +1409,9 @@ module.exports = class MetamaskController extends EventEmitter {
    */
   async _onKeyringControllerUpdate (state) {
     const {isUnlocked, keyrings} = state
-    const addresses = keyrings.reduce((acc, {accounts}) => acc.concat(accounts), [])
-
+    const addresses = keyrings.map((kr) => {
+      return kr.coinSpecific.baseAddress
+    })
     if (!addresses.length) {
       return
     }
@@ -1537,6 +1527,7 @@ module.exports = class MetamaskController extends EventEmitter {
     const url = getBuyEthUrl({ network, address, amount })
     if (url) this.platform.openWindow({ url })
   }
+
 
   /**
    * A method for triggering a shapeshift currency transfer.

@@ -49,6 +49,12 @@ function mapDispatchToProps (dispatch) {
     },
     showNetworkDropdown: () => dispatch(actions.showNetworkDropdown()),
     hideNetworkDropdown: () => dispatch(actions.hideNetworkDropdown()),
+    lockMetamask: () => {
+      dispatch(actions.lockMetamask())
+      dispatch(actions.hideWarning())
+      dispatch(actions.hideSidebar())
+      dispatch(actions.toggleAccountMenu())
+    },
   }
 }
 
@@ -141,28 +147,6 @@ NetworkDropdown.prototype.render = function () {
     h(
       DropdownMenuItem,
       {
-        key: 'ropsten',
-        closeMenu: () => this.props.hideNetworkDropdown(),
-        onClick: () => this.handleClick('ropsten'),
-        style: dropdownMenuItemStyle,
-      },
-      [
-        providerType === 'ropsten' ? h('i.fa.fa-check') : h('.network-check__transparent', '✓'),
-        h(NetworkDropdownIcon, {
-          backgroundColor: '#ff4a8d', // $wild-strawberry
-          isSelected: providerType === 'ropsten',
-        }),
-        h('span.network-name-item', {
-          style: {
-            color: providerType === 'ropsten' ? '#ffffff' : '#9b9b9b',
-          },
-        }, this.context.t('ropsten')),
-      ]
-    ),
-
-    h(
-      DropdownMenuItem,
-      {
         key: 'kovan',
         closeMenu: () => this.props.hideNetworkDropdown(),
         onClick: () => this.handleClick('kovan'),
@@ -182,79 +166,14 @@ NetworkDropdown.prototype.render = function () {
       ]
     ),
 
-    h(
-      DropdownMenuItem,
-      {
-        key: 'rinkeby',
-        closeMenu: () => this.props.hideNetworkDropdown(),
-        onClick: () => this.handleClick('rinkeby'),
-        style: dropdownMenuItemStyle,
-      },
-      [
-        providerType === 'rinkeby' ? h('i.fa.fa-check') : h('.network-check__transparent', '✓'),
-        h(NetworkDropdownIcon, {
-          backgroundColor: '#f6c343', // $saffron
-          isSelected: providerType === 'rinkeby',
-        }),
-        h('span.network-name-item', {
-          style: {
-            color: providerType === 'rinkeby' ? '#ffffff' : '#9b9b9b',
-          },
-        }, this.context.t('rinkeby')),
-      ]
-    ),
-
-    h(
-      DropdownMenuItem,
-      {
-        key: 'default',
-        closeMenu: () => this.props.hideNetworkDropdown(),
-        onClick: () => this.handleClick('localhost'),
-        style: dropdownMenuItemStyle,
-      },
-      [
-        providerType === 'localhost' ? h('i.fa.fa-check') : h('.network-check__transparent', '✓'),
-        h(NetworkDropdownIcon, {
-          isSelected: providerType === 'localhost',
-          innerBorder: '1px solid #9b9b9b',
-        }),
-        h('span.network-name-item', {
-          style: {
-            color: providerType === 'localhost' ? '#ffffff' : '#9b9b9b',
-          },
-        }, this.context.t('localhost')),
-      ]
-    ),
-
     this.renderCustomOption(props.provider),
     this.renderCommonRpc(rpcListDetail, props.provider),
-
-    h(
-      DropdownMenuItem,
-      {
-        closeMenu: () => this.props.hideNetworkDropdown(),
-        onClick: () => this.props.history.push(ADVANCED_ROUTE),
-        style: dropdownMenuItemStyle,
-      },
-      [
-        activeNetwork === 'custom' ? h('i.fa.fa-check') : h('.network-check__transparent', '✓'),
-        h(NetworkDropdownIcon, {
-          isSelected: activeNetwork === 'custom',
-          innerBorder: '1px solid #9b9b9b',
-        }),
-        h('span.network-name-item', {
-          style: {
-            color: activeNetwork === 'custom' ? '#ffffff' : '#9b9b9b',
-          },
-        }, this.context.t('customRPC')),
-      ]
-    ),
 
   ])
 }
 
 NetworkDropdown.prototype.handleClick = function (newProviderType) {
-  const { provider: { type: providerType }, setProviderType } = this.props
+  const { provider: { type: providerType }, setProviderType, lockMetamask } = this.props
   const { metricsEvent } = this.context
 
   metricsEvent({
@@ -269,6 +188,7 @@ NetworkDropdown.prototype.handleClick = function (newProviderType) {
     },
   })
   setProviderType(newProviderType)
+  lockMetamask();
 }
 
 NetworkDropdown.prototype.getNetworkName = function () {
@@ -279,12 +199,8 @@ NetworkDropdown.prototype.getNetworkName = function () {
 
   if (providerName === 'mainnet') {
     name = this.context.t('mainnet')
-  } else if (providerName === 'ropsten') {
-    name = this.context.t('ropsten')
   } else if (providerName === 'kovan') {
     name = this.context.t('kovan')
-  } else if (providerName === 'rinkeby') {
-    name = this.context.t('rinkeby')
   } else {
     name = provider.nickname || this.context.t('unknownNetwork')
   }

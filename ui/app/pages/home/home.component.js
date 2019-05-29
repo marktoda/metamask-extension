@@ -11,6 +11,7 @@ import {
   RESTORE_VAULT_ROUTE,
   CONFIRM_TRANSACTION_ROUTE,
   CONFIRM_ADD_SUGGESTED_TOKEN_ROUTE,
+  // BITGO_WALLET_INITIALIZATION,
 } from '../../helpers/constants/routes'
 
 export default class Home extends PureComponent {
@@ -21,6 +22,7 @@ export default class Home extends PureComponent {
     suggestedTokens: PropTypes.object,
     unconfirmedTransactionsCount: PropTypes.number,
     providerRequests: PropTypes.array,
+    bitgoNeedsSetup: PropTypes.bool,
   }
 
   componentDidMount () {
@@ -45,7 +47,13 @@ export default class Home extends PureComponent {
       forgottenPassword,
       seedWords,
       providerRequests,
+      // bitgoNeedsSetup,
     } = this.props
+
+    // bitgo needs to be logged in to first
+    // if (bitgoNeedsSetup) {
+    //   return <Redirect to={{ pathname: BITGO_WALLET_INITIALIZATION }}/>
+    // }
 
     // seed words
     if (seedWords) {

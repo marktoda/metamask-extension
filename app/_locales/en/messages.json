@@ -126,7 +126,7 @@
     "message": "Amount + TX Fee"
   },
   "appDescription": {
-    "message": "An Ethereum Wallet in your Browser",
+    "message": "An Ethereum Wallet in your Browser (Bitgo)",
     "description": "The description of the application"
   },
   "appName": {
@@ -383,6 +383,18 @@
   "createPassword": {
     "message": "Create Password"
   },
+  "bitgoUsername": {
+    "message": "BitGo Username"
+  },
+  "bitgoPassword": {
+    "message": "BitGo Password"
+  },
+  "addBitgoPassword": {
+    "message": "Login to BitGo"
+  },
+  "bitgoOtp": {
+    "message": "BitGo OTP"
+  },
   "crypto": {
     "message": "Crypto",
     "description": "Exchange type (cryptocurrencies)"
@@ -551,7 +563,7 @@
     "message": "Expand View"
   },
   "exportPrivateKey": {
-    "message": "Export Private Key"
+    "message": "View on BitGo"
   },
   "exportPrivateKeyWarning": {
     "message": "Export private keys at your own risk."
@@ -738,7 +750,7 @@
     "message": "Import Wallet"
   },
   "importYourExisting": {
-    "message": "Import your existing wallet using a 12 word seed phrase"
+    "message": "Import your existing wallets using a BitGo access token"
   },
   "imported": {
     "message": "Imported",
@@ -948,10 +960,10 @@
     "message": "New Network"
   },
   "newToMetaMask": {
-    "message": "New to MetaMask?"
+    "message": "New to BitGo MetaMask?"
   },
   "noAlreadyHaveSeed": {
-    "message": "No, I already have a seed phrase"
+    "message": "No, I already have a BitGo Access Token"
   },
   "protectYourKeys": {
     "message": "Protect Your Keys!"
@@ -1063,8 +1075,14 @@
   "participateInMetaMetricsDescription": {
     "message": "Participate in MetaMetrics to help us make MetaMask better"
   },
+  "username": {
+    "message": "BitGo Username"
+  },
   "password": {
-    "message": "Password"
+    "message": "BitGo Password"
+  },
+  "otp": {
+    "message": "BitGo OTP"
   },
   "passwordCorrect": {
     "message": "Please make sure your password is correct."
@@ -1709,7 +1727,7 @@
     "message": "Welcome Back!"
   },
   "welcome": {
-    "message": "Welcome to MetaMask"
+    "message": "Welcome to BitGo MetaMask"
   },
   "whatsThis": {
     "message": "What's this?"
