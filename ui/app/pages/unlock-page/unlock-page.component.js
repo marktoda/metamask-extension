@@ -93,7 +93,6 @@ export default class UnlockPage extends Component {
   }
 
   handleInputChange ({ target }) {
-    console.log(target);
     this.setState({ password: target.value, error: null })
 
     // tell mascot to look at page action
