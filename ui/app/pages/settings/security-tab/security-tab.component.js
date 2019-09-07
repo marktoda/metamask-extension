@@ -89,40 +89,6 @@ export default class SecurityTab extends PureComponent {
     )
   }
 
-  renderSeedWords () {
-    const { t } = this.context
-    const { history } = this.props
-
-    return (
-      <div className="settings-page__content-row">
-        <div className="settings-page__content-item">
-          <span>{ t('revealSeedWords') }</span>
-        </div>
-        <div className="settings-page__content-item">
-          <div className="settings-page__content-item-col">
-            <Button
-              type="secondary"
-              large
-              onClick={event => {
-                event.preventDefault()
-                this.context.metricsEvent({
-                  eventOpts: {
-                    category: 'Settings',
-                    action: 'Reveal Seed Phrase',
-                    name: 'Reveal Seed Phrase',
-                  },
-                })
-                history.push(REVEAL_SEED_ROUTE)
-              }}
-            >
-              { t('revealSeedWords') }
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   renderPrivacyOptIn () {
     const { t } = this.context
     const { privacyMode, setPrivacyMode } = this.props
@@ -183,7 +149,6 @@ export default class SecurityTab extends PureComponent {
         { warning && <div className="settings-tab__error">{ warning }</div> }
         { this.renderPrivacyOptIn() }
         { this.renderClearApproval() }
-        { this.renderSeedWords() }
         { this.renderMetaMetricsOptIn() }
       </div>
     )

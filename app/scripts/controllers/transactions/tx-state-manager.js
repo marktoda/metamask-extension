@@ -83,6 +83,18 @@ class TransactionStateManager extends EventEmitter {
     }, {})
   }
 
+
+  /**
+   @param [address] {string} - hex prefixed address to sort the txMetas for [optional]
+   @returns {array} the tx list whos status is approved if no address is provide
+   returns all txMetas who's status is approved for the current network
+   */
+  getPendingApprovalTransactions (address) {
+    const opts = { status: 'pendingApproval' }
+    if (address) opts.from = address
+    return this.getFilteredTxList(opts)
+  }
+
   /**
     @param [address] {string} - hex prefixed address to sort the txMetas for [optional]
     @returns {array} the tx list whos status is approved if no address is provide
@@ -225,6 +237,8 @@ class TransactionStateManager extends EventEmitter {
         case 'chainId':
           if (typeof value !== 'number' && typeof value !== 'string') throw new Error(`${key} in txParams is not a Number or hex string. got: (${value})`)
           break
+        case 'pendingApprovalId':
+          break
         default:
           if (typeof value !== 'string') throw new Error(`${key} in txParams is not a string. got: (${value})`)
           if (!ethUtil.isHexPrefixed(value)) throw new Error(`${key} in txParams is not hex prefixed. got: (${value})`)
@@ -311,12 +325,21 @@ class TransactionStateManager extends EventEmitter {
   setTxStatusUnapproved (txId) {
     this._setTxStatus(txId, 'unapproved')
   }
+
   /**
     should update the status of the tx to 'approved'.
     @param txId {number} - the txMeta Id
   */
   setTxStatusApproved (txId) {
     this._setTxStatus(txId, 'approved')
+  }
+
+  /**
+   should update the status of the tx to 'pendingApproval'.
+   @param txId {number} - the BitGo pendingApproval Id
+   */
+  setTxStatusPendingApproval (txId) {
+    this._setTxStatus(txId, 'pendingApproval')
   }
 
   /**

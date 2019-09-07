@@ -25,9 +25,12 @@ class PendingTransactionTracker extends EventEmitter {
     this.query = new EthQuery(config.provider)
     this.nonceTracker = config.nonceTracker
     this.getPendingTransactions = config.getPendingTransactions
+    this.getPendingApprovalTransactions = config.getPendingApprovalTransactions
     this.getCompletedTransactions = config.getCompletedTransactions
     this.publishTransaction = config.publishTransaction
     this.confirmTransaction = config.confirmTransaction
+    this.setPending = config.setPending
+    this.checkPendingApprovalState = config.checkPendingApprovalState
   }
 
   /**
@@ -39,6 +42,9 @@ class PendingTransactionTracker extends EventEmitter {
     try {
       const pendingTxs = this.getPendingTransactions()
       await Promise.all(pendingTxs.map((txMeta) => this._checkPendingTx(txMeta)))
+
+      const pendingApprovalTxs = this.getPendingApprovalTransactions()
+      await Promise.all(pendingApprovalTxs.map((txMeta) => this._checkPendingApprovalTx(txMeta)))
     } catch (err) {
       log.error('PendingTransactionTracker - Error updating pending transactions')
       log.error(err)
@@ -159,6 +165,24 @@ class PendingTransactionTracker extends EventEmitter {
       }
       this.emit('tx:warning', txMeta, err)
     }
+  }
+
+  /**
+   Ask BitGo for the transaction to see if it has been approved yet
+   @param txMeta {Object} - the txMeta object
+   @emits tx:failed
+   @emits tx:confirmed
+   @emits tx:warning
+   */
+  async _checkPendingApprovalTx (txMeta) {
+    const txHash = txMeta.hash
+    const txId = txMeta.id
+    const pendingApprovalId = txMeta.txParams.pendingApprovalId
+    const state = this.checkPendingApprovalState(pendingApprovalId, txMeta.txParams.from);
+    if (state) {
+      this.setPending(txId);
+    }
+    return;
   }
 
   /**
