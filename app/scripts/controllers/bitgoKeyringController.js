@@ -1,6 +1,7 @@
 const log = require('loglevel')
 const ethUtil = require('ethereumjs-util')
 const BN = ethUtil.BN
+const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter
 const ObservableStore = require('obs-store')
 const filter = require('promise-filter')
@@ -286,6 +287,30 @@ class KeyringController extends EventEmitter {
   }
 
 
+  // Check whether a given pending approval is confirmed
+  async checkPendingApprovalState (pendingApprovalId, from) {
+    const accessToken = this.memStore.getState().accessToken;
+    if (!accessToken) {
+      return false;
+    }
+    this.bitgo.authenticateWithAccessToken({ accessToken });
+    const wallets = this.keyrings.filter((keyring) => keyring.coinSpecific.baseAddress === from);
+    if (wallets.length !== 1) {
+      return false;
+    }
+    const walletId = wallets[0].id;
+
+    const wallet = await this.bitgoBaseCoin.wallets().get({ id: walletId })
+    const pendingApprovals = wallet.pendingApprovals();
+    console.log(pendingApprovals);
+    console.log(pendingApprovalId);
+    console.log(from);
+    const matchingPendingApproval = pendingApprovals.filter((approval) => approval.id() === pendingApprovalId);
+    console.log(matchingPendingApproval);
+    return matchingPendingApproval.length === 0 || matchingPendingApproval[0].state() === "approved";
+  }
+
+
   // SIGNING METHODS
   //
   // This method signs tx and returns a promise for
@@ -303,7 +328,7 @@ class KeyringController extends EventEmitter {
       throw new Error("No access token available");
     }
     this.bitgo.authenticateWithAccessToken({ accessToken });
-    this.bitgo.unlock({ otp })
+    await this.bitgo.unlock({ otp })
     const buildParams = {
       address: to,
       amount: value.toString(10),
@@ -321,7 +346,11 @@ class KeyringController extends EventEmitter {
 
     const wallet = await this.bitgoBaseCoin.wallets().get({ id: walletId })
     const transaction = await wallet.send(buildParams)
-    return transaction.txid
+    if (_.isNil(transaction.txid) && !_.isNil(transaction.pendingApproval)) {
+      return transaction.pendingApproval.id
+    } else {
+      return transaction.txid
+    }
   }
 
   // Sign Message
@@ -387,18 +416,6 @@ class KeyringController extends EventEmitter {
   // faucets that account on testnet,
   // puts the current seed words into the state tree.
   async createFirstKeyTree (accessToken) {
-    // this.clearKeyrings()
-    // return this.addNewKeyring('HD Key Tree', { numberOfAccounts: 1 })
-    //   .then((keyring) => {
-    //     return keyring.getAccounts()
-    //   })
-    //   .then((accounts) => {
-    //     const firstAccount = accounts[0]
-    //     if (!firstAccount) throw new Error('KeyringController - No account found on keychain.')
-    //     const hexAccount = normalizeAddress(firstAccount)
-    //     this.emit('newVault', hexAccount)
-    //     return null
-    //   })
     await this.unlockKeyrings(accessToken);
     return new Promise((resolve) => {
       resolve();
@@ -415,29 +432,6 @@ class KeyringController extends EventEmitter {
   // encrypts that array with the provided `password`,
   // and persists that encrypted string to storage.
   persistAllKeyrings (password = this.password) {
-    // if (typeof password !== 'string') {
-    //   return Promise.reject('KeyringController - password is not a string')
-    // }
-    //
-    // this.password = password
-    // this.memStore.updateState({ isUnlocked: true })
-    // return Promise.all(this.keyrings.map((keyring) => {
-    //   return Promise.all([keyring.type, keyring.serialize()])
-    //     .then((serializedKeyringArray) => {
-    //       // Label the output values on each serialized Keyring:
-    //       return {
-    //         type: serializedKeyringArray[0],
-    //         data: serializedKeyringArray[1],
-    //       }
-    //     })
-    // }))
-    //   .then((serializedKeyrings) => {
-    //     return this.encryptor.encrypt(this.password, serializedKeyrings)
-    //   })
-    //   .then((encryptedString) => {
-    //     this.store.updateState({ vault: encryptedString })
-    //     return true
-    //   })
     this.password = password;
     this.memStore.updateState({ isUnlocked: true });
     this.store.updateState({ vault: 'asdfasdfadsf' })

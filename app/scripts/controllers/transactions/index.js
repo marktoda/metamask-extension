@@ -87,8 +87,11 @@ class TransactionController extends EventEmitter {
         const approved = this.txStateManager.getApprovedTransactions()
         return [...pending, ...approved]
       },
+      getPendingApprovalTransactions: this.txStateManager.getPendingApprovalTransactions.bind(this.txStateManager),
       approveTransaction: this.approveTransaction.bind(this),
+      setPending: this.txStateManager.setTxStatusApproved.bind(this.txStateManager),
       getCompletedTransactions: this.txStateManager.getConfirmedTransactions.bind(this.txStateManager),
+      checkPendingApprovalState: opts.checkPendingApprovalState
     })
 
     this.txStateManager.store.subscribe(() => this.emit('update:badge'))
@@ -366,7 +369,12 @@ class TransactionController extends EventEmitter {
       // must set transaction to submitted/failed before releasing lock
       nonceLock.releaseLock()
     } catch (err) {
+      console.log(err);
       // this is try-catch wrapped so that we can guarantee that the nonceLock is released
+      if (err.message === 'denied by policy') {
+        return;
+      }
+
       try {
         this.txStateManager.setTxStatusFailed(txId, err)
       } catch (err) {
@@ -392,10 +400,17 @@ class TransactionController extends EventEmitter {
     const fromAddress = txParams.from
     const ethTx = new Transaction(txParams)
     const bitgoTxid = await this.signEthTx(txParams, fromAddress, password, otp)
-    // set state to signed
-    this.txStateManager.setTxStatusSigned(txMeta.id)
-    this.setTxHash(txId, bitgoTxid)
-    this.txStateManager.setTxStatusSubmitted(txId)
+    // Then it is a pending approvalid
+    if (bitgoTxid.length < 64) {
+      const pendingApprovalId = bitgoTxid;
+      this.txStateManager.setTxStatusPendingApproval(txId);
+      this.txStateManager.updateTxParams(txId, { pendingApprovalId });
+    } else {
+      // set state to signed
+      this.txStateManager.setTxStatusSigned(txMeta.id)
+      this.setTxHash(txId, bitgoTxid)
+      this.txStateManager.setTxStatusSubmitted(txId)
+    }
     return bitgoTxid
   }
 
