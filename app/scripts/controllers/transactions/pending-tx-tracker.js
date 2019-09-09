@@ -30,7 +30,9 @@ class PendingTransactionTracker extends EventEmitter {
     this.publishTransaction = config.publishTransaction
     this.confirmTransaction = config.confirmTransaction
     this.setPending = config.setPending
+    this.setFailed = config.setFailed
     this.checkPendingApprovalState = config.checkPendingApprovalState
+    this.updateTx = config.updateTx
   }
 
   /**
@@ -175,12 +177,15 @@ class PendingTransactionTracker extends EventEmitter {
    @emits tx:warning
    */
   async _checkPendingApprovalTx (txMeta) {
-    const txHash = txMeta.hash
     const txId = txMeta.id
     const pendingApprovalId = txMeta.txParams.pendingApprovalId
-    const state = this.checkPendingApprovalState(pendingApprovalId, txMeta.txParams.from);
-    if (state) {
-      this.setPending(txId);
+    const txHash = await this.checkPendingApprovalState(pendingApprovalId, txMeta.txParams.from);
+    if (txHash === "failed") {
+      this.setFailed(txId, "Rejected Policy")
+    } else if (txHash !== null) {
+      txMeta.hash = txHash;
+      this.updateTx(txMeta, 'pending approval transactions#setTxHash')
+      this.setPending(txId)
     }
     return;
   }

@@ -288,26 +288,43 @@ class KeyringController extends EventEmitter {
 
 
   // Check whether a given pending approval is confirmed
+  // If still pending, return null
+  // If rejected, return failed
+  // If approved, return txid
   async checkPendingApprovalState (pendingApprovalId, from) {
     const accessToken = this.memStore.getState().accessToken;
     if (!accessToken) {
-      return false;
+      return null;
     }
+    const xhr = new XMLHttpRequest();
+
+    const url = "https://" + (this.env === "prod" ? "www.bitgo.com/api/v2/eth/" : "test.bitgo.com/api/v2/teth/")
+    xhr.open("GET", url + "pendingApprovals/" + pendingApprovalId, false)
+    xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
+    xhr.send()
+
+    const result = JSON.parse(xhr.responseText)
+    const state = result.state;
+    if (state === "rejected") {
+      return "failed"
+    } else if (state !== "approved") {
+      return null;
+    }
+
+
     this.bitgo.authenticateWithAccessToken({ accessToken });
     const wallets = this.keyrings.filter((keyring) => keyring.coinSpecific.baseAddress === from);
     if (wallets.length !== 1) {
-      return false;
+      return null;
     }
     const walletId = wallets[0].id;
-
     const wallet = await this.bitgoBaseCoin.wallets().get({ id: walletId })
-    const pendingApprovals = wallet.pendingApprovals();
-    console.log(pendingApprovals);
-    console.log(pendingApprovalId);
-    console.log(from);
-    const matchingPendingApproval = pendingApprovals.filter((approval) => approval.id() === pendingApprovalId);
-    console.log(matchingPendingApproval);
-    return matchingPendingApproval.length === 0 || matchingPendingApproval[0].state() === "approved";
+    const transfers = await wallet.transfers();
+    const matchingTransfers = _.filter(transfers.transfers, (transfer) => transfer.pendingApproval === pendingApprovalId);
+    if (matchingTransfers.length !== 1) {
+      return null;
+    }
+    return matchingTransfers[0].txid;
   }
 
 

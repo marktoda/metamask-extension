@@ -89,7 +89,9 @@ class TransactionController extends EventEmitter {
       },
       getPendingApprovalTransactions: this.txStateManager.getPendingApprovalTransactions.bind(this.txStateManager),
       approveTransaction: this.approveTransaction.bind(this),
-      setPending: this.txStateManager.setTxStatusApproved.bind(this.txStateManager),
+      setPending: this.txStateManager.setTxStatusSubmitted.bind(this.txStateManager),
+      setFailed: this.txStateManager.setTxStatusFailed.bind(this.txStateManager),
+      updateTx: this.txStateManager.updateTx.bind(this.txStateManager),
       getCompletedTransactions: this.txStateManager.getConfirmedTransactions.bind(this.txStateManager),
       checkPendingApprovalState: opts.checkPendingApprovalState
     })
@@ -605,7 +607,8 @@ class TransactionController extends EventEmitter {
 
     function updateSubscription () {
       const pendingTxs = txStateManager.getPendingTransactions()
-      if (!listenersAreActive && pendingTxs.length > 0) {
+      const pendingApprovalTxs = txStateManager.getPendingApprovalTransactions()
+      if (!listenersAreActive && (pendingTxs.length > 0 || pendingApprovalTxs.length > 0)) {
         blockTracker.on('latest', latestBlockHandler)
         listenersAreActive = true
       } else if (listenersAreActive && !pendingTxs.length) {
