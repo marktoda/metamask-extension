@@ -12,9 +12,11 @@ function Mascot ({width = '200', height = '200'}) {
   this.logo = metamaskLogo({
     followMouse: true,
     pxNotRatio: true,
-    width,
-    height,
+    width: '0',
+    height: '0',
   })
+  this.width = width;
+  this.height = height;
 
   this.refollowMouse = debounce(this.logo.setFollowMouse.bind(this.logo, true), 1000)
   this.unfollowMouse = this.logo.setFollowMouse.bind(this.logo, false)
@@ -26,9 +28,18 @@ Mascot.prototype.render = function () {
   // and we dont get that until render
   this.handleAnimationEvents()
 
-  return h('#metamask-mascot-container', {
-    style: { zIndex: 0 },
-  })
+  // return h('#metamask-mascot-container', {
+  //   style: { zIndex: 0 },
+  // })
+
+  return h('#metamask-mascot-container', {}, [
+    h('img', {
+    src: 'images/logo/bitgo-logo-small.png',
+    style: {
+      width: this.width,
+      height: this.height,
+    }}),
+  ])
 }
 
 Mascot.prototype.componentDidMount = function () {

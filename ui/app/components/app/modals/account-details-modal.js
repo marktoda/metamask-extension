@@ -8,7 +8,7 @@ const AccountModalContainer = require('./account-modal-container')
 const { getSelectedIdentity } = require('../../../selectors/selectors')
 const genAccountLink = require('../../../../lib/account-link.js')
 const QrView = require('../../ui/qr-code')
-const EditableLabel = require('../../ui/editable-label')
+const SimpleLabel = require('../../ui/simple-label')
 
 import Button from '../../ui/button'
 
@@ -71,7 +71,7 @@ AccountDetailsModal.prototype.render = function () {
   let exportPrivateKeyFeatureEnabled = true
 
   return h(AccountModalContainer, {}, [
-      h(EditableLabel, {
+      h(SimpleLabel, {
         className: 'account-modal__name',
         defaultValue: name,
         onSubmit: label => setAccountLabel(address, label),
